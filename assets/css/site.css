@@ -1,0 +1,2586 @@
+/* A Figtree mora aqui, nao no Google. Tres motivos: (1) enquanto ela vinha de
+   fora, o texto do topo era desenhado na fonte de reserva e o cabecalho passava
+   de 460px em 390px — a pagina rolava de lado no carregamento; (2) some uma
+   conexao externa que bloqueava a renderizacao; (3) a pagina deixa de bater no
+   Google quando alguem so abre o site. Variavel 400..900, 30 KB no total. */
+@font-face {
+  font-family: 'Figtree';
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url(../fonts/figtree-latinext.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Figtree';
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url(../fonts/figtree-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* ==========================================================================
+   CRM EUROTECH — landing page comercial
+   Paleta WEB/BOLD extraida do papel timbrado e das pecas reais da marca.
+   Nao inventar cor: se nao esta neste bloco, nao e Eurotech.
+   ========================================================================== */
+
+:root {
+  --azul-vivo: #0080C0;
+  --ciano: #00A0D0;
+  --electric: #2D9CFF;
+  --azul-medio: #00567F;
+  --azul-fundo: #00415F;
+  --ink: #0e1320;
+  --paper: #fbfcfe;
+  --nevoa: #cfe0ec;
+  --grafite: #171717;
+
+  /* vermelho de erro do proprio sistema (COR_STATUS do eurotech-sistemas),
+     usado so como sinal: marcar o que esta quebrado */
+  --erro: #e2445c;
+
+  /* cores do logo oficial (assets/img/logo-eurotech.svg) */
+  --logo-claro: #8ED8F7;
+  --logo-claro-fim: #73CDF3;
+  --logo-medio: #4AB7EC;
+  --logo-medio-fim: #32A8E7;
+
+  --hero-gradiente: radial-gradient(120% 120% at 80% 10%, #0080C0 0%, #00567F 45%, #00415F 100%);
+
+  --pad-lateral: 6vw;
+  --max: 1280px;
+  --raio: 12px;
+  --raio-min: 6px;
+
+  --hairline: rgba(14, 19, 32, .12);
+  --hairline-claro: rgba(255, 255, 255, .16);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+/* A causa do estouro horizontal (a Figtree chegando de fora e o topo sendo
+   desenhado na fonte de reserva, mais larga) foi resolvida na raiz: a fonte
+   agora e local e vem com preload. Este clip fica como cinto de seguranca —
+   corta sem criar contexto de rolagem, ao contrario do overflow:hidden. */
+html { overflow-x: clip; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--grafite);
+  font-family: Figtree, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+img { max-width: 100%; display: block; }
+a { color: inherit; }
+[id] { scroll-margin-top: 104px; }
+/* peso comedido no corpo: strong em 600, nunca o 700 sintetizado */
+strong { font-weight: 600; }
+
+h1, h2, h3 {
+  font-family: Figtree, Arial, Helvetica, sans-serif;
+  letter-spacing: -.02em;
+  line-height: 1.04;
+  margin: 0;
+}
+
+/* numero e Arial — regra da marca, nao usar mono fora de rotulo */
+.num { font-family: Arial, Helvetica, sans-serif; font-weight: 700; letter-spacing: -.02em; }
+
+.wrap { width: 100%; max-width: var(--max); margin-inline: auto; padding-inline: var(--pad-lateral); }
+
+.secao { padding-block: clamp(64px, 9vw, 128px); position: relative; }
+/* preto foi rejeitado pela marca: o escuro da pagina e o azul profundo */
+.secao--escura { background: linear-gradient(165deg, #00567F -20%, #00415F 45%); color: #fff; }
+.secao--azul { background: var(--hero-gradiente); color: #fff; }
+.secao > .wrap { position: relative; z-index: 2; }
+
+/* ---------------------------------------------- fundos vivos (decorativos) */
+/* losangos da marca flutuando devagar, como poeira de dado */
+.particulas { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.particulas i {
+  position: absolute;
+  bottom: -60px;
+  left: var(--x, 50%);
+  width: var(--s, 24px);
+  height: var(--s, 24px);
+  border-radius: 12%;
+  transform: rotate(45deg);
+  background: var(--azul-vivo);
+  opacity: 0;
+  animation: flutua var(--t, 26s) linear var(--d, 0s) infinite;
+}
+.particulas--ciano i { background: var(--ciano); }
+.particulas--claras i { background: #fff; }
+@keyframes flutua {
+  0% { transform: translateY(0) rotate(45deg); opacity: 0; }
+  10% { opacity: var(--o, .05); }
+  88% { opacity: var(--o, .05); }
+  100% { transform: translateY(-880px) rotate(45deg); opacity: 0; }
+}
+
+/* fundo da demonstracao — o sinal saindo do canto dos contatos.
+   Trocou o grafico de barras: aquilo virava bloco opaco atras dos campos.
+   Aqui nada cruza o formulario com forma dura; e luz e textura. */
+.fundo-ondas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+/* campo de pontos: adensa no canto de onde o sinal sai e some antes do
+   formulario, que fica na parte limpa da composicao */
+.fundo-ondas__pontos {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(141, 216, 247, .55) 1.1px, transparent 1.6px);
+  background-size: 34px 34px;
+  /* mais largo que alto: a textura corre rente ao rodape da secao inteira
+     e so o miolo do formulario fica limpo */
+  -webkit-mask-image: radial-gradient(150% 105% at 0% 100%, #000 0%, rgba(0, 0, 0, .5) 46%, transparent 82%);
+  mask-image: radial-gradient(150% 105% at 0% 100%, #000 0%, rgba(0, 0, 0, .5) 46%, transparent 82%);
+  opacity: .8;
+}
+/* os pulsos: aneis largos e macios que saem do canto e varrem os pontos.
+   Sao gradientes sem borda definida, entao passam por cima do formulario
+   como claridade, nunca como risco. */
+.fundo-ondas i {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 1000px;
+  height: 1000px;
+  margin: 0 0 -500px -500px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side,
+    transparent 62%,
+    rgba(0, 176, 232, .34) 76%,
+    rgba(0, 176, 232, .1) 87%,
+    transparent 95%);
+  transform: scale(.08);
+  animation: onda-sai 9s linear infinite;
+}
+.fundo-ondas i:nth-of-type(2) { animation-delay: -3s; }
+.fundo-ondas i:nth-of-type(3) { animation-delay: -6s; }
+@keyframes onda-sai {
+  0%   { transform: scale(.08); opacity: 0; }
+  14%  { opacity: 1; }
+  72%  { opacity: .7; }
+  100% { transform: scale(3.2); opacity: 0; }
+}
+/* a fonte: um brilho parado no canto, pra onda parecer sair de algum lugar */
+.fundo-ondas::before {
+  content: "";
+  position: absolute;
+  left: -12%;
+  bottom: -30%;
+  width: 48%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(0, 176, 232, .30), rgba(0, 160, 208, .08) 56%, transparent 78%);
+}
+/* e uma luz fria do lado do formulario, pra ele ser o ponto claro da tela */
+.fundo-ondas::after {
+  content: "";
+  position: absolute;
+  right: -10%;
+  top: -26%;
+  width: 60%;
+  aspect-ratio: 1.2;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(45, 156, 255, .16), transparent 72%);
+}
+
+/* --------------------------------------------------------------- eyebrow */
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--azul-medio);
+  margin: 0 0 22px;
+}
+.eyebrow::before {
+  content: "";
+  width: 34px;
+  height: 2px;
+  background: var(--ciano);
+  flex: none;
+}
+.secao--escura .eyebrow, .secao--azul .eyebrow, .hero .eyebrow { color: var(--nevoa); }
+
+.titulo-secao { font-size: clamp(30px, 4.4vw, 58px); font-weight: 900; text-transform: uppercase; text-wrap: balance; }
+/* revelacao: cada palavra sobe de tras de uma mascara (sem trocar o texto) */
+.js .titulo-anim .p {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding-bottom: .14em;
+  margin-bottom: -.14em;
+}
+.js .titulo-anim .p i {
+  display: inline-block;
+  font-style: normal;
+  transform: translateY(112%);
+  transition: transform .75s cubic-bezier(.19, 1, .22, 1);
+}
+.js .titulo-anim.mostra .p i { transform: none; }
+/* em coluna estreita o titulo cede tamanho pra respeitar as quebras */
+.duas-colunas .titulo-secao,
+.contato-grade .titulo-secao { font-size: clamp(26px, 2.7vw, 38px); }
+.linha-apoio {
+  margin: 20px 0 0;
+  max-width: 62ch;
+  font-size: clamp(16px, 1.3vw, 19px);
+  color: rgba(14, 19, 32, .82);
+}
+.secao--escura .linha-apoio, .secao--azul .linha-apoio { color: var(--nevoa); }
+
+/* --------------------------------------------------------------- botoes */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: Figtree, Arial, Helvetica, sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 15px 28px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform .2s ease, box-shadow .25s ease, filter .2s ease, background-color .2s ease;
+}
+/* botao realista (ref. Uiverse/Spacious74): sobe no hover, AFUNDA no clique */
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: translateY(2px) scale(.985); transition-duration: .06s; }
+.btn:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+
+/* estilo moody-badger (Uiverse): escuro, arredondado, glow azul que
+   inunda no hover — com a fisica de pressao mantida no clique */
+/* o CTA principal e a tecla branca: e o unico elemento claro sobre o
+   azul, entao domina a tela sem precisar gritar (10,9:1 de contraste) */
+.btn--primario {
+  background: linear-gradient(180deg, #ffffff 0%, #e7eff6 100%);
+  color: var(--azul-fundo);
+  border: 1px solid rgba(0, 65, 95, .22);
+  box-shadow:
+    inset 0 1.5px 0 #fff,
+    inset 0 -2px 5px rgba(0, 65, 95, .18),
+    0 2px 3px rgba(0, 20, 40, .4),
+    0 10px 26px rgba(0, 20, 40, .38);
+}
+.btn--primario:hover {
+  color: var(--azul-vivo);
+  border-color: rgba(0, 160, 208, .5);
+  box-shadow:
+    inset 0 1.5px 0 #fff,
+    inset 0 -2px 5px rgba(0, 65, 95, .18),
+    0 3px 5px rgba(0, 20, 40, .4),
+    0 14px 32px rgba(0, 20, 40, .45),
+    0 0 26px rgba(0, 160, 208, .5);
+}
+.btn--primario:active {
+  box-shadow:
+    inset 0 3px 9px rgba(0, 65, 95, .32),
+    0 2px 4px rgba(0, 20, 40, .3);
+}
+/* o secundario recua de proposito: so contorno, sem preenchimento */
+.btn--fantasma {
+  background: transparent;
+  color: rgba(255, 255, 255, .92);
+  border: 1px solid rgba(255, 255, 255, .34);
+  box-shadow: none;
+}
+.btn--fantasma:hover {
+  color: #fff;
+  border-color: #fff;
+  background: rgba(255, 255, 255, .08);
+}
+.btn--fantasma:active { background: rgba(255, 255, 255, .04); }
+.btn--pill { border-radius: 999px; padding: 12px 22px; font-size: 13px; white-space: nowrap; }
+
+/* --------------------------------------------------------------- marca
+   O logo e SEMPRE o arquivo oficial (assets/img/logo-eurotech.svg).
+   A versao desenhada em CSS foi aposentada em 2026-08-06. */
+.marca { display: flex; align-items: center; gap: 13px; text-decoration: none; }
+.marca img { width: 52px; height: auto; flex: none; }
+/* assinatura: EUROTECH em cima, SISTEMAS logo abaixo — igual a intro */
+.marca__nome { display: grid; gap: 3px; }
+.marca__sis {
+  font-family: Figtree, Arial, Helvetica, sans-serif;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .33em;
+  line-height: 1;
+  color: var(--nevoa);
+  white-space: nowrap;
+}
+
+.wordmark {
+  font-family: Figtree, Arial, Helvetica, sans-serif;
+  font-weight: 900;
+  font-size: 25px;
+  line-height: 1;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: var(--grafite);
+  white-space: nowrap;
+}
+.wordmark b { font-weight: 800; color: var(--ciano); }
+.topo--claro .wordmark { color: #fff; }
+
+/* ------------------------------------------------- barra de progresso */
+.progresso {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 3px;
+  z-index: 70;
+  pointer-events: none;
+}
+.progresso i {
+  display: block;
+  height: 100%;
+  transform: scaleX(var(--p, 0));
+  transform-origin: left;
+  background: linear-gradient(90deg, var(--azul-vivo), var(--ciano), var(--electric));
+  box-shadow: 0 0 12px rgba(0, 160, 208, .8);
+}
+
+/* --------------------------------------------------------------- topo */
+/* barra FIXA com cor CONSTANTE: nada muda ao rolar (pedido do dono) */
+.topo {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 50;
+  padding-block: 16px;
+  background: rgba(0, 65, 95, .9);
+  -webkit-backdrop-filter: saturate(140%) blur(10px);
+  backdrop-filter: saturate(140%) blur(10px);
+  box-shadow: 0 1px 0 rgba(0, 160, 208, .28);
+}
+.topo .wrap { display: flex; align-items: center; gap: 24px; }
+.topo nav { margin-left: auto; display: flex; align-items: center; gap: 28px; }
+.topo nav a {
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  color: #fff;
+  transition: color .18s ease, background-color .18s ease;
+}
+/* links limpos com sublinhado ciano que desliza no hover */
+.topo nav a:not(.btn) {
+  position: relative;
+  font-size: 14.5px;
+  font-weight: 600;
+  padding: 6px 2px;
+}
+.topo nav a:not(.btn)::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--ciano);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .28s cubic-bezier(.2, .7, .2, 1);
+}
+.topo nav a:not(.btn):hover::after { transform: scaleX(1); }
+
+/* CTA do topo: tecla branca realista — bisel, sombra interna e pressao */
+/* precisa vencer o `.topo nav a { color:#fff }`, senao some no branco */
+/* gap de .3em em vez dos 10px do .btn: "Agendar demonstração" sao duas
+   palavras, nao rotulo + icone, entao o espaco tem que ser de palavra */
+.topo nav a.btn--pill { padding: 14px 24px; gap: .3em; color: var(--azul-fundo); }
+.topo nav a.btn--pill:hover { color: var(--azul-vivo); }
+.topo .btn--pill:hover {
+  color: var(--azul-vivo);
+  filter: brightness(1.03);
+  box-shadow:
+    inset 0 1.5px 0 #fff,
+    inset 0 -2px 5px rgba(0, 65, 95, .2),
+    0 3px 5px rgba(0, 20, 40, .4),
+    0 12px 26px rgba(0, 20, 40, .4),
+    0 0 18px rgba(0, 160, 208, .35);
+}
+.topo .btn--pill:active {
+  box-shadow:
+    inset 0 3px 8px rgba(0, 65, 95, .3),
+    0 2px 4px rgba(0, 20, 40, .3);
+}
+
+/* --------------------------------------------------------------- hero */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: grid;
+  align-content: center;
+  background: var(--hero-gradiente);
+  color: #fff;
+  overflow: hidden;
+  padding-block: 150px 40px;
+}
+
+/* caixas interativas (estilo background-boxes): plano inclinado que cobre
+   o hero INTEIRO, cantos incluidos; cada quadrado acende sob o cursor */
+.caixas {
+  position: absolute;
+  left: -70%;
+  top: -140%;
+  width: 245%;
+  height: 370%;
+  z-index: 0;
+  display: grid;
+  grid-template-columns: repeat(32, 1fr);
+  grid-template-rows: repeat(22, 1fr);
+  transform: skewX(-48deg) skewY(14deg) scale(.68) translateZ(0);
+}
+.caixas i { border: 1px solid rgba(255, 255, 255, .07); }
+
+.hero .wrap { position: relative; z-index: 2; }
+.hero__grade { display: grid; grid-template-columns: 1.1fr .9fr; gap: clamp(40px, 5vw, 72px); align-items: center; }
+
+.hero h1 {
+  font-size: clamp(40px, 4.8vw, 68px);
+  font-weight: 900;
+  line-height: .96;
+  letter-spacing: -.02em;
+  text-transform: uppercase;
+}
+/* destaque em branco AA; o ciano assina por baixo, como traço nao-textual */
+.hero h1 em {
+  font-style: normal;
+  color: #fff;
+  text-decoration: underline;
+  text-decoration-color: var(--ciano);
+  text-decoration-thickness: .09em;
+  text-underline-offset: .12em;
+}
+.hero__sub {
+  margin: 26px 0 0;
+  max-width: 560px;
+  font-size: clamp(16px, 1.4vw, 20px);
+  line-height: 1.5;
+  color: var(--nevoa);
+}
+.hero__acoes { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 36px; }
+.atitude {
+  margin-top: 44px;
+  font-family: Figtree, Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .34em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, .78);
+}
+/* ------------------------- mockup do produto: janela com funil kanban */
+.mock { position: relative; z-index: 2; }
+.mock__janela {
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 34px 90px rgba(0, 43, 63, .5), 0 0 0 1px rgba(255, 255, 255, .14);
+}
+.mock__barra {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 14px;
+  background: var(--azul-fundo);
+}
+.mock__barra i { width: 10px; height: 10px; border-radius: 50%; background: var(--pt, #c3cdd6); }
+.mock__url {
+  margin-left: 10px;
+  flex: 1;
+  font-size: 11.5px;
+  letter-spacing: .03em;
+  color: var(--nevoa);
+  background: rgba(255, 255, 255, .1);
+  border-radius: 6px;
+  padding: 4px 12px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.mock__corpo { display: flex; min-height: 330px; }
+.mock__lateral {
+  flex: none;
+  width: 52px;
+  background: linear-gradient(180deg, var(--azul-fundo), var(--azul-medio));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding-block: 14px;
+}
+.mock__lateral img { width: 26px; height: auto; margin-bottom: 6px; }
+.mock__lateral i { width: 22px; height: 5px; border-radius: 3px; background: rgba(255, 255, 255, .28); }
+.mock__lateral i:first-of-type { background: var(--ciano); }
+.mock__main { flex: 1; padding: 14px; background: #f4f7fa; }
+.mock__kanban { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; height: 100%; }
+.mock__col .mock__rot {
+  margin: 0 0 8px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(14, 19, 32, .55);
+}
+.mock__card {
+  position: relative;
+  background: #fff;
+  border: 1px solid rgba(14, 19, 32, .08);
+  border-left: 4px solid var(--cs, var(--azul-vivo));
+  border-radius: 8px;
+  padding: 9px 10px 10px 12px;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 6px rgba(0, 43, 63, .06);
+}
+.mock__card b { display: block; font-size: 12px; font-weight: 700; color: #1a1f2b; line-height: 1.3; }
+.mock__card span { display: block; margin-top: 3px; font-size: 10.5px; color: rgba(14, 19, 32, .55); }
+.mock__card--fantasma {
+  border: 1.5px dashed rgba(14, 19, 32, .18);
+  border-radius: 8px;
+  height: 44px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.previa-legenda { margin: 14px 0 0; font-size: 11.5px; letter-spacing: .06em; color: var(--nevoa); }
+
+/* --------- fluxograma horizontal: trilho de etapas + palco de paginas */
+.fluxograma { margin-top: 56px; }
+.fluxograma__trilho {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2.6vw, 34px);
+  margin-bottom: 40px;
+}
+.fluxograma__linha {
+  position: absolute;
+  left: 30px;
+  right: 20px;
+  top: 50%;
+  height: 2px;
+  background: rgba(255, 255, 255, .16);
+  z-index: 0;
+}
+/* o caminho ja percorrido fica aceso atras da luz */
+.fluxograma__linha i {
+  display: block;
+  height: 100%;
+  width: 100%;
+  transform: scaleX(var(--feito, 0));
+  transform-origin: left;
+  background: linear-gradient(90deg, var(--ciano), rgba(0, 160, 208, .55));
+  box-shadow: 0 0 10px rgba(0, 160, 208, .55);
+  transition: transform 1.15s cubic-bezier(.45, 0, .55, 1);
+}
+/* a luz corre pelo trilho POR TRAS das pilulas — some ao ser absorvida */
+.fluxograma__luz {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: #eafaff;
+  box-shadow: 0 0 8px 2px rgba(255, 255, 255, .5), 0 0 22px 7px rgba(0, 160, 208, .75);
+  z-index: 0;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(0);
+  transition: transform 1.15s cubic-bezier(.45, 0, .55, 1), opacity .35s ease;
+}
+.fluxograma__luz.acesa { opacity: 1; }
+/* ao chegar na etapa, um anel se abre a partir dela */
+.fluxograma__no::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 999px;
+  border: 2px solid var(--cor);
+  opacity: 0;
+  pointer-events: none;
+}
+.fluxograma__no.chegada::before { animation: anel-chegada .85s ease-out; }
+@keyframes anel-chegada {
+  0% { transform: scale(.94); opacity: .95; }
+  100% { transform: scale(1.32); opacity: 0; }
+}
+.fluxograma__logo {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  width: 62px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  background: var(--azul-fundo);
+  border: 1px solid rgba(0, 160, 208, .45);
+  border-radius: 12px;
+  box-shadow: 0 0 22px rgba(0, 160, 208, .35);
+}
+.fluxograma__no {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: 999px;
+  background: rgba(0, 65, 95, .72);
+  border: 2px solid rgba(255, 255, 255, .18);
+  color: #fff;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color .3s ease, border-color .3s ease, transform .3s ease, box-shadow .3s ease, color .3s ease;
+}
+.fluxograma__no .num {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .1);
+  border: 1.5px solid var(--cor);
+  /* o numeral e branco (8,2:1); quem carrega o acento e o anel. Como --cor,
+     o verde dava 3,75:1 e o laranja 4,36:1 sobre o azul da pilula. */
+  color: #fff;
+  font-size: 14px;
+  transition: background-color .3s ease, color .3s ease;
+}
+.fluxograma__no:hover { border-color: var(--cor); }
+.fluxograma__no:hover:not(.ativa) { transform: translateY(-5px); box-shadow: 0 12px 28px rgba(0, 20, 40, .35), 0 0 18px var(--cor); }
+.fluxograma__no:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.fluxograma__no.ativa {
+  background: #fff;
+  color: var(--azul-fundo);
+  border-color: var(--cor);
+  transform: scale(1.05);
+  box-shadow: 0 0 26px -2px var(--cor), 0 10px 26px rgba(0, 20, 40, .35);
+}
+/* o numeral fica ESCURO sobre o acento: branco sobre #19b4e6 dava 2,41:1,
+   e sobre o verde e o laranja tambem reprovava. Escuro passa em todos. */
+.fluxograma__no.ativa .num { background: var(--cor); border-color: var(--cor); color: var(--ink); }
+/* barra de progresso do auto-avanco embaixo da etapa ativa */
+.fluxograma__no::after {
+  content: "";
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  bottom: -12px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--cor);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.fluxograma__no.ativa::after { animation: no-progresso 6s linear forwards; }
+/* so corre com a secao na tela — senao ela ja chega cheia no scroll */
+.js .fluxograma__no.ativa::after { animation-play-state: paused; }
+.rodando .fluxograma__no.ativa::after { animation-play-state: running; }
+@keyframes no-progresso { to { transform: scaleX(1); } }
+
+.palco { position: relative; min-height: 430px; }
+/* com JS o palco acompanha a altura da pagina ativa; o min-height acima fica
+   valendo so pra quem esta sem JS, onde as tres paginas ficam sobrepostas */
+.js .palco { min-height: 0; transition: height .55s cubic-bezier(.2, .7, .2, 1); }
+.palco__pagina {
+  position: absolute;
+  /* sem o bottom:0 a altura vem do conteudo, e nao sobra vazio na etapa curta */
+  inset: 0 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: clamp(28px, 4vw, 56px);
+  align-items: center;
+  padding: clamp(26px, 3.4vw, 46px);
+  border-radius: 18px;
+  background: rgba(0, 65, 95, .5);
+  border: 1px solid rgba(255, 255, 255, .14);
+  opacity: 0;
+  transform: translateX(70px) scale(.985);
+  pointer-events: none;
+  transition: opacity .55s ease, transform .6s cubic-bezier(.2, .7, .2, 1);
+}
+.palco__pagina.ativa { opacity: 1; transform: none; pointer-events: auto; }
+.palco__info h3 {
+  font-size: clamp(26px, 3vw, 40px);
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #fff;
+}
+.palco__info h3::after {
+  content: "";
+  display: block;
+  width: 64px;
+  height: 4px;
+  border-radius: 2px;
+  margin-top: 10px;
+  background: var(--cor);
+}
+.palco__info > p { margin: 16px 0 0; font-size: clamp(16px, 1.4vw, 19px); color: var(--nevoa); }
+.palco__info ul { list-style: none; margin: 22px 0 0; padding: 0; display: grid; gap: 12px; }
+.palco__info li { position: relative; padding-left: 26px; font-size: 15.5px; color: #fff; }
+.palco__info li::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 7px;
+  width: 9px;
+  height: 9px;
+  border-radius: 12%;
+  transform: rotate(45deg);
+  background: var(--cor);
+  box-shadow: 0 0 8px var(--cor);
+}
+.palco__visual {
+  background: #f4f7fa;
+  border-radius: 14px;
+  padding: clamp(16px, 2vw, 26px);
+  box-shadow: 0 24px 60px rgba(0, 20, 40, .45);
+}
+
+/* visuais por pagina */
+.pv-kan { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.pv-card {
+  background: #fff;
+  border: 1px solid rgba(14, 19, 32, .08);
+  border-left: 4px solid var(--c, var(--azul-vivo));
+  border-radius: 9px;
+  padding: 12px 14px;
+  box-shadow: 0 2px 8px rgba(0, 43, 63, .08);
+}
+.pv-card b { display: block; font-size: 13.5px; color: #1a1f2b; }
+.pv-card span { display: block; margin-top: 3px; font-size: 11.5px; color: rgba(14, 19, 32, .55); }
+.ativa .pv-card { opacity: 0; animation: pv-entra .5s ease forwards; }
+.ativa .pv-card:nth-child(1) { animation-delay: .25s; }
+.ativa .pv-card:nth-child(2) { animation-delay: .4s; }
+.ativa .pv-card:nth-child(3) { animation-delay: .55s; }
+.ativa .pv-card:nth-child(4) { animation-delay: .7s; }
+@keyframes pv-entra { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+.pv-med { display: grid; gap: 16px; }
+.pv-linha { display: grid; grid-template-columns: 92px 1fr 52px; align-items: center; gap: 12px; }
+.pv-linha span { font-size: 13px; font-weight: 600; color: #1a1f2b; }
+.pv-linha em { display: block; height: 12px; border-radius: 6px; background: rgba(14, 19, 32, .08); overflow: hidden; }
+.pv-linha i {
+  display: block;
+  height: 100%;
+  width: var(--w, 50%);
+  border-radius: 6px;
+  background: linear-gradient(90deg, #fdab3d, #ff9f1a);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.ativa .pv-linha i { animation: pv-enche 1s cubic-bezier(.2, .7, .2, 1) forwards; }
+.ativa .pv-linha:nth-child(1) i { animation-delay: .3s; }
+.ativa .pv-linha:nth-child(2) i { animation-delay: .45s; }
+.ativa .pv-linha:nth-child(3) i { animation-delay: .6s; }
+.ativa .pv-linha:nth-child(4) i { animation-delay: .75s; }
+@keyframes pv-enche { to { transform: scaleX(1); } }
+.pv-linha b { font-size: 13px; color: rgba(14, 19, 32, .7); text-align: right; }
+
+.pv-docs { display: grid; gap: 12px; }
+.pv-doc {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid rgba(14, 19, 32, .08);
+  border-radius: 9px;
+  padding: 13px 16px;
+  box-shadow: 0 2px 8px rgba(0, 43, 63, .08);
+}
+.pv-doc svg { width: 20px; height: 20px; stroke: var(--azul-medio); fill: none; stroke-width: 1.8; flex: none; }
+.pv-doc b { font-size: 13.5px; color: #1a1f2b; flex: 1; }
+.pv-doc em {
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 700;
+  color: #00744d;
+  background: rgba(0, 200, 117, .14);
+  border-radius: 999px;
+  padding: 4px 10px;
+}
+.ativa .pv-doc { opacity: 0; animation: pv-entra .5s ease forwards; }
+.ativa .pv-doc:nth-child(1) { animation-delay: .25s; }
+.ativa .pv-doc:nth-child(2) { animation-delay: .45s; }
+.ativa .pv-doc:nth-child(3) { animation-delay: .65s; }
+
+/* fundo de #etapas: mapa de linhas, como planta de projeto */
+.fundo-mapa { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.fundo-mapa svg { width: 100%; height: 100%; }
+.fmapa-linhas path {
+  fill: none;
+  stroke: rgba(255, 255, 255, .07);
+  stroke-width: 1.2;
+}
+.fmapa-pontos circle { fill: rgba(0, 160, 208, .22); }
+
+/* fundo de #ia: malha de nos, com pulsos viajando de no em no */
+.fundo-malha { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.fundo-malha svg { width: 100%; height: 100%; }
+.fmalha-linhas path { fill: none; stroke: rgba(255, 255, 255, .07); stroke-width: 1.2; }
+.fmalha-nos circle {
+  fill: rgba(0, 160, 208, .28);
+  animation: no-respira 5s ease-in-out infinite alternate;
+}
+.fmalha-nos circle:nth-child(3n) { animation-delay: -1.7s; }
+.fmalha-nos circle:nth-child(3n+1) { animation-delay: -3.4s; }
+@keyframes no-respira { to { opacity: .35; } }
+.fmalha-pulso { fill: var(--ciano); filter: drop-shadow(0 0 6px rgba(0, 160, 208, .85)); }
+
+/* fundo claro: grade blueprint discreta (usada em #crm e no #faq) */
+.fundo-grade-clara {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  /* prancheta de projeto: divisao fina + divisao maior a cada 4 modulos,
+     como papel milimetrado de engenharia — nao um quadriculado enfeite */
+  background-image:
+    linear-gradient(rgba(0, 86, 127, .085) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 86, 127, .085) 1px, transparent 1px),
+    linear-gradient(rgba(0, 86, 127, .17) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 86, 127, .17) 1px, transparent 1px);
+  background-size: 74px 74px, 74px 74px, 296px 296px, 296px 296px;
+  -webkit-mask-image: radial-gradient(125% 95% at 50% 40%, #000 50%, transparent 100%);
+  mask-image: radial-gradient(125% 95% at 50% 40%, #000 50%, transparent 100%);
+}
+
+/* fundo do #faq: losangos so de contorno, girando devagar */
+.fundo-losangos { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.fundo-losangos i {
+  position: absolute;
+  left: var(--x, 50%);
+  top: var(--y, 50%);
+  width: var(--s, 160px);
+  height: var(--s, 160px);
+  border: 1.5px solid rgba(0, 128, 192, .1);
+  border-radius: 9%;
+  animation: losango-gira var(--t, 40s) linear infinite var(--rev, normal);
+}
+@keyframes losango-gira {
+  from { transform: rotate(45deg); }
+  to { transform: rotate(405deg); }
+}
+
+/* fundo de #seguranca: grade de permissao — poucas celulas liberadas,
+   o resto fechado. Metafora de "cada um ve so o que o cargo permite". */
+.fundo-permissao {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  grid-auto-rows: 84px;
+  /* o miolo, onde mora o texto, fica limpo; a grade vive nas bordas */
+  -webkit-mask-image: radial-gradient(75% 65% at 50% 50%, transparent 40%, #000 100%);
+  mask-image: radial-gradient(75% 65% at 50% 50%, transparent 40%, #000 100%);
+}
+.fundo-permissao i { border: 1px solid rgba(255, 255, 255, .045); position: relative; }
+/* celula liberada: acende devagar e apaga */
+.fundo-permissao i.livre {
+  background: rgba(0, 160, 208, .045);
+  border-color: rgba(0, 160, 208, .16);
+}
+.fundo-permissao i.livre::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  border-radius: 12%;
+  transform: rotate(45deg);
+  background: var(--ciano);
+  box-shadow: 0 0 8px rgba(0, 160, 208, .5);
+  animation: celula-pisca 4s ease-in-out var(--pd, 0s) infinite;
+}
+@keyframes celula-pisca {
+  0%, 100% { opacity: .12; }
+  50% { opacity: .5; }
+}
+
+/* fundo de #como: trilhas de circuito com pulsos correndo por elas */
+.fundo-circuito { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.fundo-circuito svg { width: 100%; height: 100%; }
+.fc-trilhas path {
+  fill: none;
+  stroke: rgba(255, 255, 255, .1);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+.fc-nos circle { fill: rgba(0, 160, 208, .32); }
+.fc-pulso { fill: var(--ciano); filter: drop-shadow(0 0 7px rgba(0, 160, 208, .9)); }
+
+/* ---------------- fluxo da IA: pacote viaja pelas 4 estacoes (12s) */
+.fluxo { position: relative; margin-top: 56px; padding-top: 10px; }
+.fluxo__nos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.fluxo__no { position: relative; text-align: center; }
+.fluxo__icone {
+  position: relative;
+  z-index: 1;
+  display: inline-grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: rgba(0, 65, 95, .55);
+  border: 1.5px solid rgba(255, 255, 255, .22);
+}
+.fluxo__icone svg { width: 26px; height: 26px; stroke: #fff; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.fluxo__no b {
+  display: block;
+  margin-top: 12px;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--nevoa);
+}
+.fluxo__linha {
+  position: absolute;
+  top: 38px;
+  left: 12.5%;
+  right: 12.5%;
+  height: 2px;
+  background: rgba(255, 255, 255, .18);
+}
+.fluxo__linha i {
+  display: block;
+  height: 100%;
+  background: var(--ciano);
+  box-shadow: 0 0 10px rgba(0, 160, 208, .8);
+  transform-origin: left;
+  animation: fluxo-fill 12s linear infinite;
+}
+.fluxo__pacote {
+  position: absolute;
+  top: 38px;
+  left: 12.5%;
+  width: 11px;
+  height: 11px;
+  margin: -5.5px 0 0 -5.5px;
+  border-radius: 50%;
+  background: #eafaff;
+  box-shadow: 0 0 8px 2px rgba(255, 255, 255, .5), 0 0 22px 7px rgba(0, 160, 208, .8);
+  z-index: 2;
+  animation: fluxo-pacote 12s linear infinite;
+}
+/* rastro curto atras da luz */
+.fluxo__pacote::after {
+  content: "";
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  width: 40px;
+  height: 2px;
+  margin-top: -1px;
+  border-radius: 2px;
+  background: linear-gradient(270deg, rgba(0, 160, 208, .75), transparent);
+}
+.fluxo__no--1 .fluxo__icone { animation: fluxo-no1 12s linear infinite; }
+.fluxo__no--2 .fluxo__icone { animation: fluxo-no2 12s linear infinite; }
+.fluxo__no--3 .fluxo__icone { animation: fluxo-no3 12s linear infinite; }
+.fluxo__no--4 .fluxo__icone { animation: fluxo-no4 12s linear infinite; }
+.fluxo__check {
+  position: absolute;
+  top: -8px;
+  right: calc(50% - 42px);
+  z-index: 2;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #00c875;
+  box-shadow: 0 0 12px rgba(0, 200, 117, .8);
+  transform: scale(0);
+  animation: fluxo-check 12s linear infinite;
+}
+.fluxo__check svg { width: 14px; height: 14px; stroke: #fff; fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.fluxo__doc {
+  position: absolute;
+  top: -6px;
+  right: calc(50% - 44px);
+  z-index: 2;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 6px 16px rgba(0, 20, 40, .4);
+  opacity: 0;
+  animation: fluxo-doc 12s linear infinite;
+}
+.fluxo__doc svg { width: 15px; height: 15px; stroke: var(--azul-medio); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+@keyframes fluxo-pacote {
+  0% { left: 12.5%; opacity: 0; }
+  3%, 12% { left: 12.5%; opacity: 1; }
+  22%, 36% { left: 37.5%; opacity: 1; }
+  46%, 64% { left: 62.5%; opacity: 1; }
+  74%, 92% { left: 87.5%; opacity: 1; }
+  97%, 100% { left: 87.5%; opacity: 0; }
+}
+@keyframes fluxo-fill {
+  0%, 12% { transform: scaleX(0); }
+  22%, 36% { transform: scaleX(.334); }
+  46%, 64% { transform: scaleX(.667); }
+  74%, 100% { transform: scaleX(1); }
+}
+@keyframes fluxo-no1 {
+  0%, 2% { border-color: rgba(255, 255, 255, .22); background: rgba(0, 65, 95, .55); box-shadow: none; }
+  3%, 13% { border-color: var(--ciano); background: rgba(0, 160, 208, .3); box-shadow: 0 0 18px rgba(0, 160, 208, .6); }
+  16%, 100% { border-color: rgba(255, 255, 255, .22); background: rgba(0, 65, 95, .55); box-shadow: none; }
+}
+@keyframes fluxo-no2 {
+  0%, 20% { border-color: rgba(255, 255, 255, .22); background: rgba(0, 65, 95, .55); box-shadow: none; }
+  22%, 37% { border-color: var(--ciano); background: rgba(0, 160, 208, .3); box-shadow: 0 0 18px rgba(0, 160, 208, .6); }
+  40%, 100% { border-color: rgba(255, 255, 255, .22); background: rgba(0, 65, 95, .55); box-shadow: none; }
+}
+@keyframes fluxo-no3 {
+  0%, 44% { border-color: rgba(255, 255, 255, .22); background: rgba(0, 65, 95, .55); box-shadow: none; }
+  46%, 65% { border-color: #00c875; background: rgba(0, 200, 117, .22); box-shadow: 0 0 18px rgba(0, 200, 117, .55); }
+  68%, 100% { border-color: rgba(255, 255, 255, .22); background: rgba(0, 65, 95, .55); box-shadow: none; }
+}
+@keyframes fluxo-no4 {
+  0%, 72% { border-color: rgba(255, 255, 255, .22); background: rgba(0, 65, 95, .55); box-shadow: none; }
+  74%, 93% { border-color: var(--ciano); background: rgba(0, 160, 208, .3); box-shadow: 0 0 18px rgba(0, 160, 208, .6); }
+  96%, 100% { border-color: rgba(255, 255, 255, .22); background: rgba(0, 65, 95, .55); box-shadow: none; }
+}
+@keyframes fluxo-check {
+  0%, 48% { transform: scale(0); }
+  52%, 66% { transform: scale(1); }
+  70%, 100% { transform: scale(0); }
+}
+@keyframes fluxo-doc {
+  0%, 78% { transform: translateY(8px); opacity: 0; }
+  84%, 94% { transform: translateY(-26px); opacity: 1; }
+  98%, 100% { transform: translateY(-30px); opacity: 0; }
+}
+
+/* ------------------------------------------------ faq (details nativo) */
+.faq { display: grid; gap: 14px; margin-top: 52px; max-width: 860px; }
+.faq details {
+  background: #fff;
+  border: 1px solid var(--hairline);
+  border-radius: var(--raio);
+  overflow: hidden;
+  transition: border-color .25s ease, box-shadow .25s ease;
+}
+.faq details[open] { border-color: rgba(0, 128, 192, .4); box-shadow: 0 12px 32px rgba(0, 65, 95, .1); }
+.faq summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 24px;
+  font-weight: 700;
+  font-size: 16.5px;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-radius: 12%;
+  background: var(--ciano);
+  transform: rotate(45deg);
+  flex: none;
+  transition: transform .35s ease, background-color .35s ease;
+}
+.faq details[open] summary::before { transform: rotate(225deg); background: var(--azul-vivo); }
+.faq details p {
+  margin: 0;
+  padding: 0 24px 22px 47px;
+  font-size: 15px;
+  color: rgba(14, 19, 32, .76);
+  animation: faq-abre .35s ease;
+}
+@keyframes faq-abre { from { opacity: 0; transform: translateY(-6px); } }
+
+/* ----------------- intro: a marca se monta, o chao abre e ela cai */
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: none;
+  place-items: center;
+  background: var(--hero-gradiente);
+  overflow: hidden;
+}
+.intro.ativa { display: grid; }
+.intro.some { display: none; }
+/* lockup: logo a esquerda + assinatura da marca a direita */
+.intro__lock { display: flex; align-items: center; gap: clamp(16px, 2.2vw, 30px); }
+.intro__marca { width: min(180px, 34vw); height: auto; flex: none; overflow: visible; }
+/* cada peca do logo oficial anima em torno do proprio centro */
+.intro__lo { transform-box: fill-box; transform-origin: center; opacity: 0; }
+.intro.monta .intro__lo--t { animation: lo-chega-t .9s cubic-bezier(.2, .7, .2, 1.08) forwards; }
+.intro.monta .intro__lo--e { animation: lo-chega-e .9s cubic-bezier(.2, .7, .2, 1.08) .12s forwards; }
+.intro.monta .intro__lo--d { animation: lo-chega-d .9s cubic-bezier(.2, .7, .2, 1.08) .24s forwards; }
+@keyframes lo-chega-t {
+  from { transform: translate(0, -900%) rotate(-270deg) scale(.4); opacity: 0; }
+  35% { opacity: 1; }
+  to { transform: translate(0, 0) rotate(0) scale(1); opacity: 1; }
+}
+@keyframes lo-chega-e {
+  from { transform: translate(-900%, 420%) rotate(270deg) scale(.4); opacity: 0; }
+  35% { opacity: 1; }
+  to { transform: translate(0, 0) rotate(0) scale(1); opacity: 1; }
+}
+@keyframes lo-chega-d {
+  from { transform: translate(900%, 460%) rotate(-270deg) scale(.4); opacity: 0; }
+  35% { opacity: 1; }
+  to { transform: translate(0, 0) rotate(0) scale(1); opacity: 1; }
+}
+.intro.formada .intro__marca { animation: marca-forma .45s ease; }
+.intro__marca { filter: drop-shadow(0 0 46px rgba(0, 160, 208, .55)); }
+@keyframes marca-forma { 50% { transform: scale(1.07); } }
+
+/* a assinatura sai DE DENTRO da logo, revelada da esquerda pra direita */
+.intro__nome {
+  display: grid;
+  gap: .18em;
+  white-space: nowrap;
+  clip-path: inset(0 100% 0 0);
+  opacity: 0;
+  transform: translateX(-26px);
+}
+.intro.assina .intro__nome {
+  clip-path: inset(0 -30% 0 0);
+  opacity: 1;
+  transform: translateX(0);
+  transition: clip-path .8s cubic-bezier(.2, .7, .2, 1), opacity .5s ease .1s, transform .8s cubic-bezier(.2, .7, .2, 1);
+}
+.intro__euro {
+  font-family: Figtree, Arial, Helvetica, sans-serif;
+  font-weight: 900;
+  font-size: clamp(30px, 4.6vw, 52px);
+  line-height: 1;
+  letter-spacing: .02em;
+  color: #fff;
+}
+.intro__euro b { font-weight: 900; color: var(--ciano); }
+.intro__sis {
+  font-family: Figtree, Arial, Helvetica, sans-serif;
+  font-weight: 600;
+  font-size: clamp(12px, 1.5vw, 17px);
+  letter-spacing: .42em;
+  color: var(--nevoa);
+}
+/* o lockup comeca deslocado pra direita (logo no centro da tela) e
+   desliza pra esquerda enquanto o nome aparece */
+.intro__lock { transition: transform .8s cubic-bezier(.2, .7, .2, 1); }
+
+/* saida: a tela de carregamento se dissolve e entrega o site */
+.intro { transition: opacity .55s ease; }
+.intro.sai { opacity: 0; }
+
+/* versao calma (reduced-motion): tudo so com fade */
+.intro.calma .intro__lo--t { animation: intro-fade .7s ease .1s forwards; }
+.intro.calma .intro__lo--e { animation: intro-fade .7s ease .28s forwards; }
+.intro.calma .intro__lo--d { animation: intro-fade .7s ease .46s forwards; }
+@keyframes intro-fade { to { opacity: 1; } }
+
+.com-intro { overflow: hidden; }
+
+/* --------------------------------------------- whatsapp fixo (estilo app) */
+.zap {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 60;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #00c875;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 12px 30px rgba(0, 200, 117, .45);
+  transition: transform .2s ease;
+}
+.zap:hover { transform: translateY(-3px) scale(1.05); }
+.zap:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.zap svg { width: 24px; height: 24px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.zap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 200, 117, .7);
+  animation: zap-pulsa 2.4s ease-out infinite;
+}
+@keyframes zap-pulsa {
+  from { transform: scale(1); opacity: .8; }
+  to { transform: scale(1.55); opacity: 0; }
+}
+
+/* marca d'agua: o logo oficial do repositorio, gigante, colado na direita.
+   Passa o cursor: ela SOBE e acende, como algo interativo. */
+.marca-dagua {
+  position: absolute;
+  top: 50%;
+  right: -6%;
+  transform: translateY(-50%);
+  width: min(560px, 52vw);
+  height: auto;
+  z-index: 1;
+  opacity: .16;
+  filter: drop-shadow(0 0 70px rgba(0, 160, 208, .45));
+  animation: respira-marca 11s ease-in-out infinite alternate;
+  transition: transform .5s cubic-bezier(.2, .7, .2, 1), opacity .5s ease, filter .5s ease;
+  cursor: pointer;
+}
+.marca-dagua:hover {
+  animation: none;
+  transform: translateY(calc(-50% - 28px)) scale(1.04);
+  opacity: .3;
+  filter: drop-shadow(0 0 110px rgba(0, 160, 208, .8));
+}
+.marca-dagua--clara { opacity: .06; filter: none; }
+@keyframes respira-marca { to { transform: translateY(calc(-50% + 14px)); } }
+
+@keyframes ponto-badge { 50% { opacity: .45; } }
+
+/* chips de HUD flutuando ao redor do painel — o sistema vivo */
+.hud {
+  position: absolute;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border-radius: 999px;
+  background: rgba(0, 65, 95, .68);
+  border: 1px solid rgba(0, 160, 208, .45);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 30px rgba(0, 20, 40, .35), 0 0 18px rgba(0, 160, 208, .18);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: #fff;
+  white-space: nowrap;
+  animation: hud-flutua var(--fx, 6s) ease-in-out var(--fd, 0s) infinite alternate;
+}
+.hud::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 12%;
+  transform: rotate(45deg);
+  background: var(--ciano);
+  box-shadow: 0 0 8px var(--ciano);
+  flex: none;
+}
+.hud--1 { top: -18px; right: -26px; }
+.hud--2 { top: 44%; left: -84px; }
+.hud--3 { bottom: 26px; right: -30px; }
+@keyframes hud-flutua { to { transform: translateY(-10px); } }
+@media (max-width: 1080px) { .hud { display: none; } }
+
+/* --------------------------------------------------------------- provas */
+.faixa-provas { background: var(--azul-fundo); color: #fff; padding-block: clamp(40px, 5vw, 64px); position: relative; overflow: hidden; }
+.faixa-provas > .wrap { position: relative; z-index: 2; }
+/* regua de medicao + linha de tendencia que se desenha */
+.fundo-regua {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(0, 160, 208, .3) 1px, transparent 1px);
+  background-size: 34px 34px;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  opacity: .5;
+}
+.fundo-regua__linha { position: absolute; inset: 0; width: 100%; height: 100%; }
+.fundo-regua__linha polyline {
+  stroke: rgba(0, 160, 208, .38);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 1600;
+  stroke-dashoffset: 1600;
+}
+.faixa-provas.rodando .fundo-regua__linha polyline { animation: regua-desenha 2.4s ease-out forwards; }
+@keyframes regua-desenha { to { stroke-dashoffset: 0; } }
+.provas-nota {
+  margin: 0 0 18px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: rgba(207, 224, 236, .6);
+}
+.provas {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1px;
+  background: var(--hairline-claro);
+  border-block: 1px solid var(--hairline-claro);
+}
+.prova { background: var(--azul-fundo); padding: 26px 20px; }
+.prova .valor { display: block; font-size: clamp(28px, 3.2vw, 44px); line-height: 1; color: #fff; }
+.prova .rotulo {
+  display: block;
+  margin-top: 10px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--nevoa);
+}
+
+/* --------------------------------------------------------------- cards */
+.grade-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 56px; }
+.card {
+  background: #fff;
+  border: 1px solid var(--hairline);
+  border-radius: var(--raio);
+  /* a cor do modulo vive no icone; o card so a ecoa no hover */
+  padding: 26px 24px 28px;
+  position: relative;
+  overflow: hidden;
+  transition: transform .45s cubic-bezier(.2, .7, .2, 1), border-color .25s ease, box-shadow .45s ease;
+}
+/* mesmo gesto da marca d'agua: o card sobe e acende na cor do modulo */
+.card:hover {
+  transform: translateY(-10px) scale(1.02);
+  border-color: var(--cor, rgba(0, 128, 192, .38));
+  box-shadow: 0 20px 46px rgba(0, 65, 95, .16), 0 0 26px var(--cor, rgba(0, 128, 192, .35));
+}
+/* holofote ciano que segue o mouse dentro do card */
+.card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .3s ease;
+  background: radial-gradient(230px circle at var(--mx, 50%) var(--my, 50%), rgba(0, 160, 208, .14), transparent 65%);
+}
+.card:hover::after { opacity: 1; }
+.card > * { position: relative; z-index: 1; }
+.card__icone {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: var(--cor, var(--azul-vivo));
+  display: grid;
+  place-items: center;
+  margin-bottom: 18px;
+  transition: transform .25s ease;
+}
+.card:hover .card__icone { transform: scale(1.1) rotate(-4deg); }
+/* cascata na revelacao da grade */
+.js .grade-cards .revelar:nth-child(4n+2) { transition-delay: .08s; }
+.js .grade-cards .revelar:nth-child(4n+3) { transition-delay: .16s; }
+.js .grade-cards .revelar:nth-child(4n+4) { transition-delay: .24s; }
+.card__icone svg { width: 22px; height: 22px; stroke: #fff; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.card h3 { font-size: 17px; font-weight: 800; text-transform: uppercase; letter-spacing: 0; }
+.card p { margin: 10px 0 0; font-size: 15px; color: rgba(14, 19, 32, .76); }
+
+/* --------------------------------------------------------------- passos */
+.passos {
+  list-style: none;
+  margin: 48px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--hairline-claro);
+  position: relative;
+}
+/* um losango viaja pelo trilho — a rotina andando, literalmente */
+.passos::after {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: 0;
+  width: 9px;
+  height: 9px;
+  border-radius: 12%;
+  background: var(--ciano);
+  box-shadow: 0 0 12px rgba(0, 160, 208, .9);
+  transform: rotate(45deg);
+  opacity: 0;
+  animation: viaja 7s ease-in-out infinite;
+}
+@keyframes viaja {
+  0% { left: 0; opacity: 0; }
+  8% { opacity: 1; }
+  92% { opacity: 1; }
+  100% { left: calc(100% - 9px); opacity: 0; }
+}
+.passos li { padding: 30px 26px 0 0; }
+.passos li + li { border-left: 1px solid var(--hairline-claro); padding-left: 26px; }
+.passos__indice {
+  display: block;
+  font-size: clamp(34px, 3.6vw, 52px);
+  line-height: 1;
+  color: rgba(255, 255, 255, .92);
+}
+.passos h3 { margin-top: 16px; font-size: 16px; font-weight: 800; text-transform: uppercase; }
+.passos p { margin: 10px 0 0; font-size: 14.5px; color: var(--nevoa); }
+
+/* ------------------------------------------------------------- seguranca */
+.duas-colunas { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(32px, 5vw, 72px); align-items: center; }
+.duas-colunas--topo { align-items: start; }
+
+.citacao-regra {
+  margin: 36px 0 0;
+  padding-left: 20px;
+  border-left: 3px solid var(--ciano);
+  font-family: Figtree, Arial, Helvetica, sans-serif;
+  font-weight: 800;
+  font-size: clamp(20px, 2.2vw, 28px);
+  line-height: 1.25;
+  letter-spacing: -.01em;
+  text-transform: uppercase;
+  color: var(--ciano);
+}
+
+.lista-argumentos { list-style: none; margin: 34px 0 0; padding: 0; display: grid; gap: 0; }
+.lista-argumentos li { padding: 22px 0; border-top: 1px solid var(--hairline); }
+.lista-argumentos li:last-child { border-bottom: 1px solid var(--hairline); }
+.secao--escura .lista-argumentos li, .secao--azul .lista-argumentos li { border-color: var(--hairline-claro); }
+.lista-argumentos h3 { font-size: 16px; font-weight: 800; text-transform: uppercase; }
+.lista-argumentos p { margin: 8px 0 0; font-size: 15px; color: rgba(14, 19, 32, .76); }
+.secao--escura .lista-argumentos p, .secao--azul .lista-argumentos p { color: var(--nevoa); }
+.lista-argumentos .indice {
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  /* era --ciano: 3,5:1 sobre o azul-marinho. O azul claro da marca da 6,8:1 */
+  color: var(--logo-claro);
+  margin-right: 10px;
+}
+
+/* ----------------------------------------------------- banda da assinatura */
+.banda {
+  overflow: hidden;
+  background: var(--paper);
+  border-block: 1px solid var(--hairline);
+  padding-block: clamp(26px, 4vw, 44px);
+}
+.banda__trilho {
+  display: flex;
+  width: max-content;
+  white-space: nowrap;
+  animation: rola 28s linear infinite;
+}
+.banda__trilho span {
+  font-family: Figtree, Arial, Helvetica, sans-serif;
+  font-weight: 900;
+  font-size: clamp(44px, 7vw, 96px);
+  line-height: 1;
+  letter-spacing: -.02em;
+  text-transform: uppercase;
+  color: rgba(0, 128, 192, .16);
+}
+@supports (-webkit-text-stroke: 2px #000) {
+  .banda__trilho span { color: transparent; -webkit-text-stroke: 2px rgba(0, 128, 192, .34); }
+}
+.banda__trilho i {
+  font-style: normal;
+  color: var(--ciano);
+  -webkit-text-stroke: 0;
+  margin: 0 .38em;
+}
+@keyframes rola { to { transform: translateX(-50%); } }
+/* com JS, marquees e fundos vivos so gastam compositor quando estao na tela */
+.js .banda__trilho,
+.js .particulas i, .js .fundo-losangos i, .js .fmalha-nos circle,
+.js .fluxo__pacote, .js .fluxo__linha i, .js .fluxo__icone, .js .fundo-ondas i,
+.js .fluxo__check, .js .fluxo__doc { animation-play-state: paused; }
+
+.banda.rodando .banda__trilho,
+.rodando .particulas i, .rodando .fundo-losangos i, .rodando .fmalha-nos circle,
+.rodando .fluxo__pacote, .rodando .fluxo__linha i, .rodando .fluxo__icone, .rodando .fundo-ondas i,
+.rodando .fluxo__check, .rodando .fluxo__doc { animation-play-state: running; }
+
+/* pausa ao alcance do usuario: hover para o movimento (SC 2.2.2) */
+.banda:hover .banda__trilho { animation-play-state: paused; }
+
+/* --------------------------------------------------------------- versus */
+/* align-items:start: a coluna do jeito antigo tem um item a menos e ficava
+   com ~110px de vazio so pra igualar a altura da irma */
+.versus { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 56px; align-items: start; }
+.versus__coluna { border-radius: var(--raio); padding: 34px 32px; }
+.versus__coluna h3 { font-size: 19px; font-weight: 800; text-transform: uppercase; }
+.versus__coluna ul { list-style: none; margin: 24px 0 0; padding: 0; display: grid; gap: 15px; }
+.versus__coluna li { position: relative; padding-left: 30px; font-size: 15.5px; line-height: 1.5; }
+/* a coluna do jeito antigo tem que doer: cada item e um problema real,
+   entao o vermelho aqui e sinal, nao enfeite */
+.versus__coluna--antigo {
+  background: linear-gradient(180deg, rgba(226, 68, 92, .05), rgba(226, 68, 92, 0) 45%), #fff;
+  border: 1px solid rgba(226, 68, 92, .2);
+  color: rgba(14, 19, 32, .55);
+}
+.versus__coluna--antigo h3 { color: var(--erro); }
+.versus__coluna--antigo li::before {
+  content: "✕";
+  position: absolute;
+  left: 2px;
+  top: -1px;
+  font-size: 17px;
+  font-weight: 900;
+  line-height: 1.4;
+  color: var(--erro);
+}
+.versus__coluna--novo { background: var(--hero-gradiente); color: #fff; box-shadow: 0 24px 60px rgba(0, 65, 95, .28); }
+.versus__cta { margin-top: 28px; width: 100%; }
+.versus__coluna--novo li::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 7px;
+  width: 9px;
+  height: 9px;
+  border-radius: 12%;
+  transform: rotate(45deg);
+  background: var(--ciano);
+  box-shadow: 0 0 8px rgba(0, 160, 208, .8);
+}
+
+/* --------------------------------------------------------------- setores */
+.setores { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 40px; }
+.setores span {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid var(--hairline-claro);
+  border-radius: var(--raio-min);
+  padding: 12px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  transition: transform .2s ease, border-color .2s ease;
+}
+.setores span[style]::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 12%;
+  transform: rotate(45deg);
+  background: var(--dc, var(--ciano));
+  flex: none;
+}
+.setores span:hover { transform: translateY(-3px); border-color: #fff; }
+.setores__destaque { background: #fff; border-color: #fff; color: var(--azul-medio); font-weight: 600; }
+
+/* --------------------------------------------------------------- contato */
+.contato-grade { display: grid; grid-template-columns: .9fr 1.1fr; gap: clamp(32px, 5vw, 72px); }
+.form-campos { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.campo { display: flex; flex-direction: column; gap: 7px; }
+.campo--largo { grid-column: 1 / -1; }
+.campo label { font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--nevoa); }
+.campo input, .campo select, .campo textarea {
+  font-family: inherit;
+  font-size: 15px;
+  color: #fff;
+  background: rgba(255, 255, 255, .07);
+  border: 1px solid var(--hairline-claro);
+  border-radius: var(--raio-min);
+  padding: 13px 14px;
+}
+.campo textarea { resize: vertical; min-height: 104px; }
+.campo select option { color: var(--grafite); }
+.campo input:focus, .campo select:focus, .campo textarea:focus { outline: 2px solid var(--electric); outline-offset: 1px; }
+.form-nota { margin: 18px 0 0; font-size: 13px; color: rgba(255, 255, 255, .62); }
+.form-nota a { color: #fff; }
+
+/* erro de campo — vermelho aqui e sinal de verdade, nao enfeite */
+.campo--erro input, .campo--erro select, .campo--erro textarea {
+  border-color: var(--erro);
+  background: rgba(226, 68, 92, .1);
+}
+.campo__erro {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.35;
+  color: #ff9aa7;
+}
+.campo__erro:empty { display: none; }
+
+/* estado de enviado: o que faltava pra pessoa saber que o pedido saiu */
+.form-feito:focus { outline: none; }
+.form-feito:focus-visible { outline: 2px solid var(--electric); outline-offset: 3px; }
+.form-feito {
+  border: 1px solid var(--hairline-claro);
+  border-radius: var(--raio);
+  background: rgba(255, 255, 255, .06);
+  padding: clamp(26px, 3.4vw, 40px);
+}
+.form-feito__visto {
+  width: 54px;
+  height: 54px;
+  display: block;
+  color: var(--logo-claro);
+}
+.form-feito__visto path { stroke-dasharray: 1; stroke-dashoffset: 1; }
+/* o risco so parte quando o painel aparece de fato, senao a animacao se
+   perde enquanto o bloco ainda esta escondido */
+.form-feito--mostrando .form-feito__visto path {
+  animation: visto-risca .5s .12s cubic-bezier(.6, 0, .3, 1) forwards;
+}
+@keyframes visto-risca { to { stroke-dashoffset: 0; } }
+.form-feito__titulo {
+  margin: 20px 0 0;
+  font-size: clamp(21px, 2.4vw, 27px);
+  font-weight: 800;
+  line-height: 1.15;
+  color: #fff;
+}
+.form-feito__texto { margin: 12px 0 0; color: var(--nevoa); max-width: 46ch; }
+/* o prazo: linha propria, com o losango da marca como marcador */
+.form-feito__prazo {
+  margin: 16px 0 0;
+  font-size: 15px;
+  color: #fff;
+}
+/* marcador inline: em flex, o gap entraria tambem entre "uma semana" e o ponto */
+.form-feito__prazo::before {
+  content: "";
+  display: inline-block;
+  vertical-align: 1px;
+  width: 9px;
+  height: 9px;
+  margin-right: 10px;
+  border-radius: 2px;
+  background: var(--ciano);
+  transform: rotate(45deg);
+}
+.form-feito__prazo b { font-weight: 800; }
+.form-feito__acoes { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+
+.contatos-diretos { list-style: none; margin: 32px 0 0; padding: 0; display: grid; gap: 2px; }
+.contatos-diretos li { padding: 16px 0; border-top: 1px solid var(--hairline-claro); }
+.contatos-diretos span {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--nevoa);
+  margin-bottom: 4px;
+}
+.contatos-diretos a, .contatos-diretos strong {
+  font-size: clamp(17px, 1.8vw, 22px);
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  word-break: break-word;
+}
+/* sao links de conversao e tinham 19-20px de altura no polegar */
+.contatos-diretos a {
+  display: inline-block;
+  padding-block: 12px;
+  margin-block: -12px;
+}
+.contatos-diretos .num { font-weight: 700; }
+.contatos-diretos a:hover { color: var(--ciano); }
+
+/* --------------------------------------------------------------- rodape */
+.rodape {
+  background: linear-gradient(90deg, #00415F, #00567F);
+  color: #fff;
+  padding-block: 56px 40px;
+  position: relative;
+  overflow: hidden;
+}
+.rodape > .wrap { position: relative; z-index: 2; }
+/* a marca assina o fim da pagina, cortada pela borda de baixo */
+.rodape__marca {
+  position: absolute;
+  right: 4%;
+  bottom: -38%;
+  width: min(460px, 46vw);
+  height: auto;
+  z-index: 0;
+  opacity: .07;
+  pointer-events: none;
+}
+.rodape__topo { display: flex; flex-wrap: wrap; gap: 24px; align-items: center; justify-content: space-between; }
+.rodape__topo img { width: 52px; height: auto; }
+.rodape__topo .marca__sis { color: rgba(255, 255, 255, .72); }
+.rodape__dados {
+  margin: 30px 0 0;
+  padding-top: 28px;
+  border-top: 1px solid var(--hairline-claro);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 22px 32px;
+  font-size: 14px;
+  color: var(--nevoa);
+}
+.rodape__dados strong { display: block; color: #fff; font-weight: 600; margin-bottom: 3px; }
+.rodape__dados a { color: #fff; text-decoration: none; display: inline-block; padding-block: 6px; }
+.rodape__dados a:hover { color: var(--ciano); }
+.rodape__fim {
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid var(--hairline-claro);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 28px;
+  justify-content: space-between;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, .72);
+}
+
+/* --------------------------------------------------------------- revelar
+   So esconde quando o JS confirmou que esta rodando (classe .js no <html>).
+   Sem JS a pagina inteira nasce visivel — regra da casa. */
+.js .revelar {
+  opacity: 0;
+  transform: translateY(36px) scale(.985);
+  filter: blur(10px);
+  transition: opacity .7s ease, transform .7s cubic-bezier(.2, .7, .2, 1), filter .7s ease;
+}
+.js .revelar.visivel { opacity: 1; transform: none; filter: none; }
+
+/* fotos entram com cortina lateral, por cima do reveal do bloco */
+.js .revelar img { clip-path: inset(0 100% 0 0); transition: clip-path .95s cubic-bezier(.2, .7, .2, 1) .15s; }
+.js .revelar.visivel img { clip-path: inset(0 0 0 0); }
+/* Decisao do dono (2026-08-06): as animacoes rodam SEMPRE, mesmo com
+   os efeitos de animacao do Windows desligados. Por isso o site nao
+   consulta mais prefers-reduced-motion. */
+
+/* --------------------------------------------------------------- responsivo */
+@media (max-width: 1080px) {
+  .provas { grid-template-columns: repeat(3, 1fr); }
+  .grade-cards { grid-template-columns: repeat(2, 1fr); }
+  .passos { grid-template-columns: 1fr 1fr; border-top: 0; }
+  .passos li { border-top: 1px solid var(--hairline-claro); }
+  .passos li + li { border-left: 0; padding-left: 0; }
+  .passos li:nth-child(even) { border-left: 1px solid var(--hairline-claro); padding-left: 26px; }
+}
+
+@media (max-width: 880px) {
+  .hero__grade { grid-template-columns: 1fr; gap: 40px; }
+  .hero { padding-block: 130px 36px; }
+  .marca-dagua { opacity: .06; right: -18%; }
+  .duas-colunas, .contato-grade, .versus { grid-template-columns: 1fr; }
+  .topo nav a:not(.btn) { display: none; }
+  .fluxo__no b { font-size: 10.5px; letter-spacing: .06em; }
+  .fluxograma__logo { display: none; }
+  .fluxograma__linha { left: 8px; right: 8px; }
+  .fluxograma__no { padding: 12px 10px; font-size: 12px; gap: 8px; letter-spacing: .04em; }
+  .fluxograma__no .num { width: 24px; height: 24px; font-size: 12px; }
+  .palco { min-height: 820px; }
+  .palco__pagina { grid-template-columns: 1fr; align-items: start; align-content: start; }
+}
+
+@media (max-width: 640px) {
+  .passos { grid-template-columns: 1fr; }
+  .passos li:nth-child(even) { border-left: 0; padding-left: 0; }
+}
+
+@media (max-width: 560px) {
+  /* links de contato do rodape no minimo de 44px para o polegar */
+  /* 13px de fonte no rodape compacto encolheu a caixa: 11px de padding dava 43 */
+  .rodape__dados a { padding-block: 12.5px; }
+  .provas { grid-template-columns: repeat(2, 1fr); }
+  .grade-cards { grid-template-columns: 1fr; }
+  .form-campos { grid-template-columns: 1fr; }
+  .btn { width: 100%; }
+  .topo .btn { width: auto; padding: 11px 16px; font-size: 12px; }
+  .topo .wrap { gap: 14px; }
+  .marca img { width: 40px; }
+  .wordmark { font-size: 19px; }
+  .marca__sis { font-size: 10px; letter-spacing: .18em; }
+  .so-largo { display: none; }
+  .mock__kanban { grid-template-columns: 1fr 1fr; }
+  .zap { width: 50px; height: 50px; right: 16px; bottom: 16px; }
+  /* etapa vira cartao com numero em cima do nome: "FECHAMENTO" cabe inteiro
+     e nenhuma pilula fica cortada na borda da tela */
+  .fluxograma__no {
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 6px;
+    border-radius: 14px;
+    font-size: 11px;
+    letter-spacing: .03em;
+  }
+  .fluxograma__no .num { width: 22px; height: 22px; font-size: 11px; }
+}
+
+/* ======================================================= barra de acao (celular)
+   A pagina tem ~13.900px de altura no celular. Do fim do hero ate o rodape o
+   unico caminho pra conversao era o botao flutuante do WhatsApp. */
+.barra-acao {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 70;
+  display: none;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
+  background: rgba(0, 65, 95, .92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid var(--hairline-claro);
+  transform: translateY(105%);
+  visibility: hidden;
+  transition: transform .35s cubic-bezier(.2, .7, .2, 1), visibility .35s;
+}
+.barra-acao.aparece { transform: none; visibility: visible; }
+.barra-acao .btn { flex: 1; width: auto; justify-content: center; }
+.barra-acao__zap {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #00c875;
+  display: grid;
+  place-items: center;
+}
+.barra-acao__zap svg { width: 22px; height: 22px; fill: #fff; }
+
+@media (max-width: 720px) {
+  .barra-acao { display: flex; }
+  /* com a barra na tela, o botao flutuante vira repeticao: some */
+  .zap.recolhido { transform: scale(0); pointer-events: none; }
+}
+
+/* --------------------------------------------- controle de movimento (rodape) */
+.btn-movimento {
+  font: inherit;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, .72);
+  background: none;
+  border: 1px solid var(--hairline-claro);
+  border-radius: 999px;
+  padding: 5px 13px;
+  cursor: pointer;
+  transition: color .2s ease, border-color .2s ease;
+}
+.btn-movimento:hover { color: #fff; border-color: rgba(255, 255, 255, .45); }
+
+/* Quando quem visita pede silencio, tudo para: animacao e transicao. A decisao
+   do dono continua sendo que a pagina NASCE animada — isto e uma saida de
+   emergencia pra quem passa mal com movimento, nao o padrao. */
+.parado *, .parado *::before, .parado *::after {
+  animation-play-state: paused !important;
+  transition: none !important;
+}
+
+/* =================================================================== impressao
+   Sem isto a pagina sai quase em branco: as secoes so se revelam por rolagem
+   observada, e o azul escuro come um cartucho de tinta. */
+@media print {
+  .intro, .progresso, .zap, .barra-acao, .topo,
+  .caixas, .particulas, .fundo-losangos, .fundo-ondas, .fundo-regua,
+  .fundo-grade-clara, .fundo-mapa, .fmalha, .fundo-circuito, .fundo-permissao,
+  .marca-dagua, .rodape__marca { display: none !important; }
+
+  .js .revelar, .js .revelar * {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+  .js .revelar img { clip-path: none !important; }
+
+  /* as tres etapas do fluxograma sao sobrepostas na tela; no papel saem as tres */
+  .palco { height: auto !important; min-height: 0 !important; }
+  .palco__pagina {
+    position: static !important;
+    opacity: 1 !important;
+    transform: none !important;
+    page-break-inside: avoid;
+    margin-bottom: 14px;
+  }
+  /* o FAQ e um acordeao: no papel abre inteiro */
+  details > *:not(summary) { display: block !important; }
+
+  /* tudo que na tela e azul escuro vira papel branco. O seletor pega tambem
+     os blocos internos (.prova, .card, .palco__pagina), senao sai texto
+     escuro sobre fundo escuro. */
+  body, .secao, .secao--escura, .secao--azul, .hero, .rodape, .faixa-provas,
+  .prova, .card, .palco__pagina, .mock, .versus__coluna, .bloco,
+  .toque, .quadro__col, .efeito, .efeito *,
+  .faixa-provas *, .secao--escura *, .secao--azul *, .hero *, .rodape * {
+    background: none !important;
+    background-color: transparent !important;
+    color: #111 !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+  }
+  body { background: #fff !important; }
+  .prova, .card, .palco__pagina, .versus__coluna,
+  .quadro__col, .efeito { border: 1px solid #bbb !important; }
+  /* no papel a corrente sai inteira: na tela os passos nascem apagados */
+  .efeito__lista li { opacity: 1 !important; transform: none !important; }
+  .efeito__espera, .toque__reset { display: none !important; }
+  .btn { border: 1px solid #555 !important; background: none !important; }
+  h1, h2, h3, .titulo-secao { page-break-after: avoid; }
+  a { text-decoration: underline; }
+}
+
+/* ==================================================== CRM tocavel (dentro de #crm)
+   A pagina inteira descreve o produto; aqui a pessoa usa. Uma acao no comercial
+   acende a corrente nos outros modulos — que e a promessa "num lugar so". */
+.visualmente-oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.toque {
+  position: relative;
+  z-index: 1;
+  margin: 44px 0 56px;
+  padding: clamp(20px, 2.6vw, 32px);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, .74);
+  border: 1px solid rgba(0, 86, 127, .16);
+  box-shadow: 0 18px 50px rgba(0, 43, 63, .09);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.toque__cabeca h3 {
+  margin: 0;
+  font-size: clamp(19px, 2.1vw, 25px);
+  font-weight: 800;
+  color: var(--ink);
+}
+.toque__cabeca h3 em {
+  font-style: normal;
+  color: var(--azul-vivo);
+}
+.toque__cabeca p {
+  margin: 8px 0 0;
+  max-width: 62ch;
+  color: rgba(14, 19, 32, .72);
+}
+
+.toque__palco {
+  display: grid;
+  grid-template-columns: 1.55fr 1fr;
+  gap: clamp(16px, 2.2vw, 28px);
+  margin-top: 22px;
+  /* quadro e painel terminam na mesma linha: com start sobrava um vazio */
+  align-items: stretch;
+}
+
+/* ------------------------------------------------------------------- o quadro */
+.quadro {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.quadro__col {
+  background: rgba(240, 246, 250, .9);
+  border: 1px solid rgba(0, 86, 127, .12);
+  border-radius: 12px;
+  padding: 10px 9px 12px;
+  min-height: 200px;
+  transition: background-color .25s ease, border-color .25s ease;
+}
+.quadro__col h4 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin: 0 0 10px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(14, 19, 32, .55);
+}
+.quadro__conta {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 19px;
+  height: 19px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(0, 86, 127, .1);
+  color: var(--azul-medio);
+}
+.quadro__col--fim { border-style: dashed; }
+/* a coluna que pode receber a obra se acende durante o arraste */
+.quadro__col.mirando {
+  background: rgba(0, 160, 208, .12);
+  border-color: var(--azul-vivo);
+}
+.quadro__pilha { display: flex; flex-direction: column; gap: 8px; min-height: 40px; }
+
+/* -------------------------------------------------------------------- a obra
+   Herda .mock__card (mesma linguagem do kanban do hero) e ganha o que falta
+   pra ser um botao de verdade e um alvo de arraste. */
+.obra {
+  display: block;
+  width: 100%;
+  margin: 0;
+  font: inherit;
+  text-align: left;
+  cursor: grab;
+  /* deixa a pagina rolar na vertical e reserva o gesto horizontal pro arraste */
+  touch-action: pan-y;
+  user-select: none;
+  transition: transform .3s cubic-bezier(.2, .7, .2, 1), box-shadow .2s ease,
+              border-color .2s ease, opacity .3s ease;
+}
+.obra b { display: block; font-size: 12.5px; color: var(--ink); }
+.obra__estado { display: block; margin-top: 2px; font-size: 11px; color: rgba(14, 19, 32, .6); }
+.obra:hover { box-shadow: 0 6px 16px rgba(0, 43, 63, .14); }
+.obra:focus-visible { outline: 2px solid var(--electric); outline-offset: 2px; }
+.obra.arrastando {
+  cursor: grabbing;
+  transition: none;
+  z-index: 3;
+  box-shadow: 0 14px 30px rgba(0, 43, 63, .22);
+}
+/* chegou no contrato: o cartao muda de estado, nao so de lugar */
+.obra.fechada {
+  --cs: #00c875;
+  background: linear-gradient(180deg, #fff, #f2fbf6);
+}
+.obra.fechada b::after {
+  content: "✓";
+  margin-left: 6px;
+  color: #00a55f;
+  font-weight: 700;
+}
+/* a primeira obra chama a atencao ate alguem mexer */
+.obra.dica { animation: obra-chama 2.6s ease-in-out 1.2s 3; }
+@keyframes obra-chama {
+  0%, 100% { transform: translateX(0); }
+  6% { transform: translateX(7px); }
+  12% { transform: translateX(0); }
+  18% { transform: translateX(5px); }
+  24% { transform: translateX(0); }
+}
+
+/* --------------------------------------------------------------- as consequencias */
+.efeito {
+  background: var(--azul-fundo);
+  border-radius: 14px;
+  padding: clamp(16px, 1.8vw, 22px);
+  color: #fff;
+  min-height: 200px;
+}
+.efeito__titulo {
+  margin: 0 0 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--logo-claro);
+}
+.efeito__lista { margin: 0; padding: 0; list-style: none; }
+.efeito__lista li {
+  position: relative;
+  padding: 9px 0 9px 26px;
+  opacity: .26;
+  transform: translateY(4px);
+  transition: opacity .45s ease, transform .45s cubic-bezier(.2, .7, .2, 1);
+}
+.efeito__lista li + li { border-top: 1px solid rgba(255, 255, 255, .1); }
+.efeito__lista li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 14px;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, .3);
+  transform: rotate(45deg);
+  transition: background-color .35s ease, box-shadow .35s ease;
+}
+.efeito__lista li.acesa { opacity: 1; transform: none; }
+.efeito__lista li.acesa::before {
+  background: var(--ciano);
+  box-shadow: 0 0 10px rgba(0, 160, 208, .9);
+}
+.efeito__lista b { display: block; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--logo-claro); }
+.efeito__lista span { display: block; font-size: 13.5px; margin-top: 1px; }
+.efeito__espera { margin: 12px 0 0; font-size: 13px; color: rgba(255, 255, 255, .6); }
+.efeito.acionada .efeito__espera { display: none; }
+
+/* ------------------------------------------------------------------------ pe */
+.toque__pe {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 18px 0 0;
+  font-size: 12.5px;
+  color: rgba(14, 19, 32, .55);
+}
+/* sem JS o botao nao faz nada e a instrucao de arrastar nao vale: somem os dois */
+.so-com-js, .toque__reset { display: none; }
+.js .so-com-js { display: inline; }
+.js .toque__reset { display: inline-block; }
+.toque__reset {
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--azul-medio);
+  background: none;
+  border: 1px solid rgba(0, 86, 127, .3);
+  border-radius: 999px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: background-color .2s ease, color .2s ease;
+}
+.toque__reset:hover { background: var(--azul-medio); color: #fff; }
+
+@media (max-width: 880px) {
+  .toque__palco { grid-template-columns: 1fr; }
+  .efeito { min-height: 0; }
+}
+@media (max-width: 560px) {
+  .toque { padding: 16px 13px 18px; }
+  .quadro { gap: 6px; }
+  .quadro__col { padding: 8px 6px 10px; min-height: 168px; }
+  .quadro__col h4 { font-size: 9px; letter-spacing: .06em; }
+  .mock__card.obra { padding: 8px 7px 9px 9px; }
+  .obra b { font-size: 11px; line-height: 1.2; }
+  .obra__estado { font-size: 10px; }
+}
+
+/* ================================================================ a sua conta
+   Controles de um lado, placar do outro. O numero grande e o unico elemento
+   com peso aqui — o resto e apoio. */
+.conta {
+  display: grid;
+  grid-template-columns: 1fr .82fr;
+  gap: clamp(20px, 3vw, 40px);
+  align-items: stretch;
+  margin-top: 40px;
+}
+.conta__controles {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  justify-content: center;
+  padding: clamp(20px, 2.4vw, 30px);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, .05);
+  border: 1px solid var(--hairline-claro);
+}
+.controle label {
+  display: block;
+  font-size: 13.5px;
+  line-height: 1.35;
+  color: var(--nevoa);
+  margin-bottom: 9px;
+}
+.controle__linha { display: flex; align-items: center; gap: 16px; }
+.controle__valor {
+  flex: none;
+  min-width: 58px;
+  text-align: center;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(0, 160, 208, .18);
+  border: 1px solid rgba(0, 160, 208, .5);
+  border-radius: 10px;
+  padding: 4px 8px;
+}
+
+/* o controle deslizante, desenhado na mao pros dois motores de render */
+.conta input[type="range"] {
+  flex: 1;
+  min-width: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 26px;
+  background: none;
+  cursor: pointer;
+}
+.conta input[type="range"]::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .18);
+}
+.conta input[type="range"]::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .18);
+}
+.conta input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  margin-top: -8px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--azul-vivo);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, .35);
+}
+.conta input[type="range"]::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--azul-vivo);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, .35);
+}
+.conta input[type="range"]:focus-visible { outline: 2px solid var(--electric); outline-offset: 4px; }
+
+/* ------------------------------------------------------------------ o placar */
+.placar {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(22px, 2.6vw, 34px);
+  border-radius: 18px;
+  background: linear-gradient(160deg, rgba(0, 128, 192, .34), rgba(0, 65, 95, .5));
+  border: 1px solid rgba(0, 160, 208, .4);
+}
+.placar__rotulo {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--logo-claro);
+}
+.placar__numero {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 6px 0 0;
+}
+.placar__numero b {
+  font-size: clamp(52px, 7vw, 84px);
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  letter-spacing: -.02em;
+}
+.placar__numero span { font-size: 17px; color: var(--nevoa); }
+.placar__lados {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 28px;
+  margin: 18px 0 0;
+  padding: 16px 0 0;
+  border-top: 1px solid rgba(255, 255, 255, .16);
+  list-style: none;
+}
+.placar__lados li { display: flex; align-items: baseline; gap: 7px; }
+.placar__lados b { font-size: 24px; font-weight: 700; color: #fff; }
+.placar__lados span { font-size: 13px; color: var(--nevoa); }
+.placar__formula {
+  margin: 14px 0 0;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, .6);
+}
+/* o numero pisca de leve quando muda: confirma que o controle fez efeito */
+.placar__numero b.mudou { animation: conta-pulsa .32s ease-out; }
+@keyframes conta-pulsa {
+  0% { transform: scale(1); color: var(--logo-claro); }
+  45% { transform: scale(1.045); }
+  100% { transform: scale(1); color: #fff; }
+}
+
+.conta__pe {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 28px;
+}
+.conta__pe p { margin: 0; max-width: 62ch; color: var(--nevoa); }
+
+@media (max-width: 880px) {
+  .conta { grid-template-columns: 1fr; }
+  .placar { order: -1; }
+}
+@media (max-width: 560px) {
+  .controle__linha { gap: 12px; }
+  .controle__valor { min-width: 50px; font-size: 19px; }
+  .placar__lados { gap: 8px 20px; }
+}
+
+/* ================================================================= a diferenca
+   De proposito SEM as cores de acento: a critica de 2026-08-07 apontou que o
+   arco-iris e onde a pagina mais se afasta da marca. Aqui so o ciano, uma vez
+   por bloco, como fio de topo. */
+.dif {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(14px, 1.8vw, 22px);
+  margin-top: 44px;
+}
+.dif__item {
+  position: relative;
+  padding: clamp(20px, 2.3vw, 28px);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .07);
+  border: 1px solid var(--hairline-claro);
+}
+/* fio no topo, nao na lateral: faixa lateral colorida e o maneirismo que a
+   pagina evita fora dos cartoes de kanban, onde ela tem funcao */
+.dif__item::before {
+  content: "";
+  position: absolute;
+  left: clamp(20px, 2.3vw, 28px);
+  top: 0;
+  width: 34px;
+  height: 3px;
+  border-radius: 0 0 3px 3px;
+  background: var(--ciano);
+}
+.dif__item h3 {
+  margin: 6px 0 0;
+  font-size: clamp(17px, 1.8vw, 21px);
+  font-weight: 800;
+  line-height: 1.2;
+  color: #fff;
+}
+.dif__item p {
+  margin: 10px 0 0;
+  color: var(--nevoa);
+  font-size: 15.5px;
+  line-height: 1.5;
+}
+
+/* nao e rodape nem ressalva: e o quinto diferencial, e a virada tributaria
+   deixa ele com peso proprio. Por isso ocupa a largura toda e vem aceso. */
+.dif__destaque {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  margin: 26px 0 0;
+  padding: 20px 22px;
+  border-radius: 14px;
+  background: rgba(0, 160, 208, .16);
+  border: 1px solid rgba(0, 160, 208, .45);
+  color: var(--nevoa);
+  font-size: 15.5px;
+  line-height: 1.5;
+}
+.dif__destaque b { color: #fff; }
+.dif__destaque svg {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  margin-top: 1px;
+  fill: none;
+  stroke: var(--ciano);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (max-width: 720px) {
+  .dif { grid-template-columns: 1fr; }
+}
+
+/* ============================================ area de toque minima (44px)
+   Medido em 390px reais: estes ficavam entre 26 e 34px de altura. Onde o
+   tamanho visual nao podia crescer, a area cresce por padding com margem
+   negativa — o ritmo da pagina fica igual, o polegar e que ganha espaco. */
+.marca { min-height: 44px; }
+
+.toque__reset, .btn-movimento {
+  min-height: 44px;
+  padding-block: 0;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* o controle deslizante e o unico que se arrasta: 26px era pouco pro dedo */
+.conta input[type="range"] { height: 44px; }
+
+/* o link do e-mail no rodape da nota tinha 15px */
+.form-nota a {
+  display: inline-block;
+  padding-block: 12px;
+  margin-block: -12px;
+}
+
+/* ================================================ compactar o celular (≤560px)
+   Medido em 390px reais: a pagina tinha 16.980px, cerca de vinte telas. O
+   maior peso estava na secao "O CRM" (3.057px) e no padding de 64px repetido
+   em treze secoes (1.664px so nisso). Nada de conteudo foi removido — o que
+   mudou foi densidade. */
+@media (max-width: 560px) {
+  .secao { padding-block: 40px; }
+  .hero { padding-block: 112px 28px; }
+  .faixa-provas { padding-block: 30px; }
+  .rodape { padding-block: 40px 30px; }
+
+  /* os oito modulos em duas colunas: eram oito cartoes empilhados */
+  .grade-cards { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grade-cards .card { padding: 14px 12px 16px; }
+  /* 14px/13px em vez de 17/15: apertou, mas nao virou letra de bula. Quem
+     le esta pagina toca obra e costuma ter mais de 40 anos. */
+  .grade-cards .card h3 { font-size: 14px; line-height: 1.18; }
+  .grade-cards .card p { font-size: 13px; line-height: 1.38; margin-top: 6px; }
+  .grade-cards .card__icone { width: 34px; height: 34px; border-radius: 9px; }
+  .grade-cards .card__icone svg { width: 17px; height: 17px; }
+
+  /* os seis numeros em tres colunas em vez de duas: uma fileira a menos */
+  .provas { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .prova { padding: 16px 10px; }
+  .prova .valor { font-size: 25px; }
+  /* 9,5px era menor que o "SISTEMAS" de 8,5px que a propria critica reprovou */
+  .prova .rotulo { font-size: 10.5px; letter-spacing: .04em; margin-top: 6px; }
+
+  /* titulo de secao e linha de apoio mais justos */
+  .titulo-secao { line-height: 1.02; }
+  .linha-apoio { font-size: 15.5px; line-height: 1.45; margin-top: 12px; }
+  .eyebrow { margin-bottom: 8px; }
+
+  /* o quadro tocavel e o painel de consequencias */
+  .toque { margin: 28px 0 32px; }
+  .toque__palco { gap: 12px; margin-top: 16px; }
+  .efeito { padding: 14px 15px; }
+  .efeito__lista li { padding: 7px 0 7px 24px; }
+  .efeito__lista span { font-size: 12.5px; }
+
+  /* os quatro diferenciais */
+  .dif { gap: 10px; margin-top: 28px; }
+  .dif__item { padding: 16px 15px; }
+  .dif__item p { font-size: 14.5px; line-height: 1.4; margin-top: 7px; }
+  .dif__destaque { padding: 15px 16px; font-size: 14.5px; margin-top: 16px; }
+
+  /* a calculadora */
+  .conta { gap: 14px; margin-top: 26px; }
+  .conta__controles { gap: 16px; padding: 16px 15px; }
+  .placar { padding: 18px 16px; }
+  .conta__pe { margin-top: 18px; gap: 12px; }
+
+  /* comparativo e trilho */
+  .versus { gap: 12px; margin-top: 32px; }
+  .versus__coluna { padding: 22px 18px; }
+  .versus__coluna ul { gap: 11px; margin-top: 16px; }
+  .fluxo { gap: 14px; }
+
+  /* formulario e contatos da demonstracao */
+  .contato-grade { gap: 28px; }
+  .contatos-diretos { margin-top: 20px; }
+  .contatos-diretos li { padding: 10px 0; }
+  .form-campos { gap: 12px; }
+
+  /* rodape: as colunas ficavam muito soltas empilhadas */
+  .rodape__dados { gap: 22px; }
+  .rodape__topo { margin-bottom: 26px; }
+  .rodape__fim { margin-top: 22px; padding-top: 16px; }
+
+  .fluxograma { margin-top: 34px; }
+  .setores { gap: 8px; }
+}
+
+/* segunda passada de densidade no celular — os maiores blocos que sobraram */
+@media (max-width: 560px) {
+  /* o rodape tinha cinco grupos empilhados por causa do minmax de 180px */
+  .rodape__dados {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 18px;
+    margin-top: 22px;
+    padding-top: 20px;
+    font-size: 13px;
+  }
+  .rodape__marca { display: none; }
+
+  /* o hero: menos respiro em cima e a janela do produto um pouco menor */
+  .hero { padding-block: 100px 24px; }
+  .hero__grade { gap: 26px; }
+  .hero__sub { font-size: 16px; line-height: 1.45; }
+  .hero__acoes { gap: 10px; margin-top: 22px; }
+  .atitude { margin-top: 20px; }
+  .mock__card { padding: 7px 8px 8px 10px; margin-bottom: 6px; }
+  .mock__card b { font-size: 11px; }
+  .mock__col .mock__rot { font-size: 9.5px; margin-bottom: 6px; }
+
+  /* as quatro estacoes do trilho */
+  .fluxo { gap: 12px; }
+  .fluxo__icone { width: 46px; height: 46px; }
+  .fluxo__no b { font-size: 10.5px; }
+  .fluxo__no p { font-size: 12.5px; line-height: 1.35; }
+
+  /* a lista numerada da secao de IA */
+  .lista-argumentos li { padding-block: 12px; }
+  .lista-argumentos h3 { font-size: 14px; }
+  .lista-argumentos p { font-size: 13.5px; line-height: 1.35; margin-top: 4px; }
+
+  /* a grade de permissao da seguranca e alta e so decorativa */
+  .fundo-permissao { opacity: .5; }
+}
+
+/* ============================== secoes magras: Segmentos e FAQ (>=900px)
+   Vistas na folha de contato, as duas usavam metade da largura e deixavam a
+   outra metade vazia — pareciam finas ao lado das vizinhas. Duas colunas
+   preenchem o espaco e ainda tiram altura da pagina. */
+@media (min-width: 900px) {
+  #segmentos .wrap {
+    display: grid;
+    grid-template-columns: 1.35fr .65fr;
+    gap: 48px;
+    align-items: center;
+  }
+  #segmentos .setores { margin-top: 0; align-content: center; }
+  .faq {
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 20px;
+    max-width: none;
+    align-items: start;
+  }
+}
+
+/* ---------------------------------------------- telas muito estreitas (320px)
+   E a largura que a WCAG usa pra testar refluxo. O botao do topo estourava a
+   borda e ficava cortado pelo clip. */
+@media (max-width: 380px) {
+  .topo .wrap { gap: 10px; }
+  .topo .btn { padding: 9px 11px; font-size: 10.5px; letter-spacing: .04em; }
+  .marca img { width: 34px; }
+  .wordmark { font-size: 16.5px; }
+  .marca__sis { font-size: 9px; letter-spacing: .14em; }
+}
