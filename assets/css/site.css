@@ -1949,7 +1949,7 @@ h1, h2, h3 {
   .quadro__col, .efeito { border: 1px solid #bbb !important; }
   /* no papel a corrente sai inteira: na tela os passos nascem apagados */
   .efeito__lista li { opacity: 1 !important; transform: none !important; }
-  .efeito__espera, .toque__reset { display: none !important; }
+  .efeito__espera, .toque__reset, .btn-movimento { display: none !important; }
   .btn { border: 1px solid #555 !important; background: none !important; }
   h1, h2, h3, .titulo-secao { page-break-after: avoid; }
   a { text-decoration: underline; }
