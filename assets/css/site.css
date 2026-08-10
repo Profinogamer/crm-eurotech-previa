@@ -954,8 +954,14 @@ h1, h2, h3 {
   width: 56px;
   height: 56px;
   border-radius: 14px;
-  background: rgba(0, 65, 95, .55);
-  border: 1.5px solid rgba(255, 255, 255, .22);
+  /* em variaveis porque as keyframes abaixo pintam este elemento, e animacao
+     vence qualquer especificidade no cascade — sem isto nao da pra tematizar */
+  --ic-fundo: rgba(0, 65, 95, .55);
+  --ic-borda: rgba(255, 255, 255, .22);
+  --ic-aceso: rgba(0, 160, 208, .3);
+  --ic-brilho: 0 0 18px rgba(0, 160, 208, .6);
+  background: var(--ic-fundo);
+  border: 1.5px solid var(--ic-borda);
 }
 .fluxo__icone svg { width: 26px; height: 26px; stroke: #fff; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 .fluxo__no b {
@@ -1060,24 +1066,24 @@ h1, h2, h3 {
   74%, 100% { transform: scaleX(1); }
 }
 @keyframes fluxo-no1 {
-  0%, 2% { border-color: rgba(255, 255, 255, .22); background: rgba(0, 65, 95, .55); box-shadow: none; }
-  3%, 13% { border-color: var(--ciano); background: rgba(0, 160, 208, .3); box-shadow: 0 0 18px rgba(0, 160, 208, .6); }
-  16%, 100% { border-color: rgba(255, 255, 255, .22); background: rgba(0, 65, 95, .55); box-shadow: none; }
+  0%, 2% { border-color: var(--ic-borda); background: var(--ic-fundo); box-shadow: none; }
+  3%, 13% { border-color: var(--ciano); background: var(--ic-aceso); box-shadow: var(--ic-brilho); }
+  16%, 100% { border-color: var(--ic-borda); background: var(--ic-fundo); box-shadow: none; }
 }
 @keyframes fluxo-no2 {
-  0%, 20% { border-color: rgba(255, 255, 255, .22); background: rgba(0, 65, 95, .55); box-shadow: none; }
-  22%, 37% { border-color: var(--ciano); background: rgba(0, 160, 208, .3); box-shadow: 0 0 18px rgba(0, 160, 208, .6); }
-  40%, 100% { border-color: rgba(255, 255, 255, .22); background: rgba(0, 65, 95, .55); box-shadow: none; }
+  0%, 20% { border-color: var(--ic-borda); background: var(--ic-fundo); box-shadow: none; }
+  22%, 37% { border-color: var(--ciano); background: var(--ic-aceso); box-shadow: var(--ic-brilho); }
+  40%, 100% { border-color: var(--ic-borda); background: var(--ic-fundo); box-shadow: none; }
 }
 @keyframes fluxo-no3 {
-  0%, 44% { border-color: rgba(255, 255, 255, .22); background: rgba(0, 65, 95, .55); box-shadow: none; }
+  0%, 44% { border-color: var(--ic-borda); background: var(--ic-fundo); box-shadow: none; }
   46%, 65% { border-color: #00c875; background: rgba(0, 200, 117, .22); box-shadow: 0 0 18px rgba(0, 200, 117, .55); }
-  68%, 100% { border-color: rgba(255, 255, 255, .22); background: rgba(0, 65, 95, .55); box-shadow: none; }
+  68%, 100% { border-color: var(--ic-borda); background: var(--ic-fundo); box-shadow: none; }
 }
 @keyframes fluxo-no4 {
-  0%, 72% { border-color: rgba(255, 255, 255, .22); background: rgba(0, 65, 95, .55); box-shadow: none; }
-  74%, 93% { border-color: var(--ciano); background: rgba(0, 160, 208, .3); box-shadow: 0 0 18px rgba(0, 160, 208, .6); }
-  96%, 100% { border-color: rgba(255, 255, 255, .22); background: rgba(0, 65, 95, .55); box-shadow: none; }
+  0%, 72% { border-color: var(--ic-borda); background: var(--ic-fundo); box-shadow: none; }
+  74%, 93% { border-color: var(--ciano); background: var(--ic-aceso); box-shadow: var(--ic-brilho); }
+  96%, 100% { border-color: var(--ic-borda); background: var(--ic-fundo); box-shadow: none; }
 }
 @keyframes fluxo-check {
   0%, 48% { transform: scale(0); }
@@ -2584,3 +2590,37 @@ h1, h2, h3 {
   .wordmark { font-size: 16.5px; }
   .marca__sis { font-size: 9px; letter-spacing: .14em; }
 }
+
+/* ======================================= "Como funciona" em fundo claro
+   A critica de 2026-08-07 apontou que o miolo da pagina era uma parede azul:
+   IA -> como funciona -> seguranca -> banda, sem respiro. Esta secao ficava
+   bem no meio da sequencia, entao virou a ilha clara. Tudo aqui dentro foi
+   desenhado pra fundo escuro e precisou ser reescrito. */
+.secao--clara-meio { background: linear-gradient(180deg, #fbfcfe 0%, #f1f6fa 100%); color: var(--ink); }
+.secao--clara-meio .titulo-secao { color: var(--ink); }
+.secao--clara-meio .eyebrow { color: var(--azul-medio); }
+.secao--clara-meio .linha-apoio { color: rgba(14, 19, 32, .74); }
+
+/* as quatro estacoes */
+.secao--clara-meio .fluxo__icone {
+  --ic-fundo: #fff;
+  --ic-borda: rgba(0, 86, 127, .2);
+  --ic-aceso: rgba(0, 160, 208, .2);
+  --ic-brilho: 0 0 18px rgba(0, 128, 192, .35);
+}
+.secao--clara-meio .fluxo__icone svg { stroke: var(--azul-medio); }
+.secao--clara-meio .fluxo__no b { color: var(--azul-medio); }
+.secao--clara-meio .fluxo__no p { color: rgba(14, 19, 32, .7); }
+.secao--clara-meio .fluxo__linha { background: rgba(0, 86, 127, .16); }
+
+/* o circuito ao fundo: era fio branco sobre azul, vira fio azul sobre claro */
+.secao--clara-meio .fc-trilhas path { stroke: rgba(0, 86, 127, .13); }
+.secao--clara-meio .fc-nos circle { fill: rgba(0, 128, 192, .3); }
+
+/* a lista numerada */
+.secao--clara-meio .passos li + li { border-left-color: rgba(0, 86, 127, .16); }
+.secao--clara-meio .passos::after { background: rgba(0, 86, 127, .14); }
+.secao--clara-meio .passos__indice { color: var(--azul-vivo); }
+.secao--clara-meio .passos h3 { color: var(--ink); }
+.secao--clara-meio .passos p { color: rgba(14, 19, 32, .7); }
+.secao--clara-meio .citacao-regra { color: var(--azul-medio); border-left-color: var(--azul-vivo); }
